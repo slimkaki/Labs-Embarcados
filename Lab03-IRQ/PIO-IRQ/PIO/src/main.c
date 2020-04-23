@@ -132,7 +132,6 @@ void pisca_led(int n, int t){
 // Inicializa botao SW0 do kit com interrupcao
 void io_init(void)
 {
-
   // Configura led
 	pmc_enable_periph_clk(LED_PIO_ID);
 	pio_configure(LED_PIO, PIO_OUTPUT_0, LED_IDX_MASK, PIO_DEFAULT);
@@ -153,6 +152,7 @@ void io_init(void)
   // Configura interrupção no pino referente ao botao e associa
   // função de callback caso uma interrupção for gerada
   // a função de callback é a: but_callback()
+  // Caso queremos que o botão seja detectado na descida do aperto, trocamos PIO_IT_RISE_EDGE por PIO_IT_FALL_EDGE
   pio_handler_set(BUT_PIO,
                   BUT_PIO_ID,
                   BUT_IDX_MASK,
