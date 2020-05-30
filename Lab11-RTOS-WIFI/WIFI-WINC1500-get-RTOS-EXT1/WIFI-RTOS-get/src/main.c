@@ -6,6 +6,12 @@
 #include "socket/include/socket.h"
 #include "util.h"
 
+// LED
+#define LED_PIO      PIOC
+#define LED_PIO_ID   ID_PIOC
+#define LED_IDX      8
+#define LED_IDX_MASK (1 << LED_IDX)
+
 /************************************************************************/
 /* WIFI                                                                 */
 /************************************************************************/
@@ -217,6 +223,12 @@ static void wifi_cb(uint8_t u8MsgType, void *pvMsg)
   }
 }
 
+void led_init(void) {
+	// Configura led
+	pmc_enable_periph_clk(LED_PIO_ID);
+	pio_configure(LED_PIO, PIO_OUTPUT_0, LED_IDX_MASK, PIO_DEFAULT);
+}
+
 /************************************************************************/
 /* TASKS                                                                */
 /************************************************************************/
@@ -281,7 +293,28 @@ static void task_process(void *pvParameters) {
       recv(tcp_client_socket, &g_receivedBuffer[0], MAIN_WIFI_M2M_BUFFER_SIZE, 0);
 
       if(xQueueReceive(xQueueMsg, &p_recvMsg, 5000) == pdTRUE){
-        printf(STRING_LINE);
+		char needle[20] = "led";
+		char *founded = strstr(p_recvMsg->pu8Buffer, needle);
+		//int tamanho = sizeof(founded)/sizeof(char);
+		int someInt = 0;
+		char *flagzin;
+		for (int i = 0; i < 2; i++) {
+			char j[12];
+			sprintf(j, "%d", someInt);
+			flagzin = strstr(founded, j);
+			if (flagzin != NULL) {
+				break;
+			}
+			someInt++;
+		}
+		if (someInt == 1) {
+			printf("ACENDI \n");
+			pio_clear(LED_PIO, LED_IDX_MASK);
+		} else {
+			printf("APAGUEI\n");
+			pio_set(LED_PIO, LED_IDX_MASK);	
+	}
+		
         printf(p_recvMsg->pu8Buffer);
         printf(STRING_EOL);  printf(STRING_LINE);
         state = DONE;
@@ -378,6 +411,10 @@ int main(void)
   /* Initialize the board. */
   sysclk_init();
   board_init();
+  
+  led_init();
+  pio_set(LED_PIO, LED_IDX_MASK);
+  //pio_clear(LED_PIO, LED_IDX_MASK);
 
   /* Initialize the UART console. */
   configure_console();
