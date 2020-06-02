@@ -47,8 +47,8 @@ extern "C" {
 
 #include "driver/include/m2m_wifi.h"
 /** Wi-Fi Settings */
-#define MAIN_WLAN_SSID    "Rafa" /**< Destination SSID */
-#define MAIN_WLAN_PSK     "1183772277" /**< Password for Destination SSID */
+#define MAIN_WLAN_SSID    "wifi" /**< Destination SSID */
+#define MAIN_WLAN_PSK     "password" /**< Password for Destination SSID */
 
 /** Wi-Fi Settings */
 //#define MAIN_WLAN_SSID                    "#EleNao" /**< Destination SSID */
